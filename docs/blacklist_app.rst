@@ -50,3 +50,12 @@ The blacklist app also provides a management command, ``flushexpiredtokens``,
 which will delete any tokens from the outstanding list and blacklist that have
 expired.  You should set up a cron job on your server or hosting platform which
 runs this command daily.
+
+This application provides a simple view that will blacklist any token posted
+to it.
+
+.. code-block:: python
+
+  from rest_framework_simplejwt.token_blacklist.views import blacklist_token
+
+It accepts a single post parameter and returns a 204 on success.
