@@ -1,12 +1,16 @@
 from ..serializers import TokenVerifySerializer
 from ..tokens import RefreshToken
+from ..exceptions import InvalidToken, TokenError
+
+from rest_framework.response import Response
+from rest_framework import generics, status
 
 
-class TokenBlacklistSerializer(TokenVerifySerializer):
+class BlacklistTokenSerializer(TokenVerifySerializer):
     def validate(self, attrs):
-        refresh = RefreshToken(attrs['refresh'])
-        refresh.blacklist()
-        return None
+        token = RefreshToken(attrs['token'])
+        token.blacklist()
+        return token
 
 
 class BlacklistTokenView(generics.GenericAPIView):
@@ -24,3 +28,6 @@ class BlacklistTokenView(generics.GenericAPIView):
             raise InvalidToken(e.args[0])
 
         return Response('', status=status.HTTP_204_NO_CONTENT)
+
+
+token_blacklist = BlacklistTokenView.as_view()

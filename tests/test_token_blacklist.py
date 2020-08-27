@@ -13,8 +13,9 @@ from rest_framework_simplejwt.tokens import (
     AccessToken, RefreshToken, SlidingToken,
 )
 from rest_framework_simplejwt.utils import aware_utcnow, datetime_from_epoch
+from rest_framework_simplejwt.token_blacklist.views import BlacklistTokenView
 
-from .utils import MigrationTestCase
+from .utils import MigrationTestCase, APIViewTestCase
 
 
 class TestTokenBlacklist(TestCase):
@@ -190,3 +191,24 @@ class TestPopulateJtiHexMigration(MigrationTestCase):
         actual_hexes = [i.jti_hex for i in OutstandingToken.objects.all()]
 
         self.assertEqual(actual_hexes, self.expected_hexes)
+
+
+class BlacklistTokenViewTestCase(APIViewTestCase):
+    view_name = 'token_blacklist'
+
+    def setUp(self):
+        self.username = 'test_user'
+        self.password = 'test_password'
+
+        self.user = User.objects.create_user(
+            username=self.username,
+            password=self.password,
+        )
+
+    def test_blacklist(self):
+        token = RefreshToken()
+
+        res = self.view_post(data={'token': str(token)})
+        self.assertEqual(204, res.status_code)
+        self.assertEqual(1, OutstandingToken.objects.filter(token=str(token)).count())
+    
