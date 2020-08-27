@@ -1,16 +1,12 @@
 from ..serializers import TokenVerifySerializer
-from ..tokens import AccessToken, BlacklistMixin
-
-
-class BlacklistToken(AccessToken, BlacklistMixin):
-    pass
+from ..tokens import RefreshToken
 
 
 class TokenBlacklistSerializer(TokenVerifySerializer):
     def validate(self, attrs):
-        token = BlacklistToken(attrs['token'])
-        token.blacklist()
-        return token
+        refresh = RefreshToken(attrs['refresh'])
+        refresh.blacklist()
+        return None
 
 
 class BlacklistTokenView(generics.GenericAPIView):
